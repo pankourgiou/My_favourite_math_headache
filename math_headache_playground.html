@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATHEMATICAL HEADACHE GENERATOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --chalk:   #e8e4d0;
+  --chalk2:  #c8c4b0;
+  --chalk3:  #a8a495;
+  --board:   #1a2420;
+  --board2:  #1f2e28;
+  --board3:  #243328;
+  --line:    rgba(232,228,208,0.08);
+  --red:     #ff6b6b;
+  --amber:   #ffd166;
+  --cyan:    #06d6a0;
+  --blue:    #4ecdc4;
+  --pink:    #ff9ef5;
+  --orange:  #ff9a3c;
+  --serif:   'Libre Baskerville', Georgia, serif;
+  --display: 'Playfair Display', Georgia, serif;
+  --mono:    'Fira Code', 'Courier New', monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--board);
+  color: var(--chalk);
+  font-family: var(--serif);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* chalk-board lines */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent,
+    transparent 39px,
+    var(--line) 39px,
+    var(--line) 40px
+  );
+  pointer-events: none;
+}
+
+/* chalk dust noise */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.028;
+  pointer-events: none;
+}
+
+/* HEADER */
+header {
+  position: relative; z-index: 10;
+  text-align: center;
+  padding: 52px 24px 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.site-title {
+  font-family: var(--display);
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  font-style: italic;
+  color: var(--chalk);
+  letter-spacing: -1px;
+  text-shadow:
+    2px 2px 0 rgba(0,0,0,0.4),
+    0 0 40px rgba(232,228,208,0.1);
+  animation: titleIn 1s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes titleIn {
+  from { opacity:0; transform:translateY(-20px) rotate(-1deg); }
+  to   { opacity:1; transform:translateY(0) rotate(0deg); }
+}
+
+.site-sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  color: var(--chalk3);
+  text-transform: uppercase;
+  margin-top: 10px;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.warning-tape {
+  display: inline-block;
+  background: var(--amber);
+  color: #1a1a00;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  font-weight: 700;
+  padding: 3px 16px;
+  margin-top: 12px;
+  transform: rotate(-0.5deg);
+  text-transform: uppercase;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* GRID */
+.grid {
+  position: relative; z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 2px;
+  padding: 2px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* CARD */
+.card {
+  background: var(--board2);
+  border: 1px solid rgba(232,228,208,0.07);
+  padding: 28px 26px 22px;
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.6s ease both;
+  transition: background 0.2s;
+}
+.card:hover { background: var(--board3); }
+
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.card:nth-child(1)  { animation-delay:0.05s; }
+.card:nth-child(2)  { animation-delay:0.10s; }
+.card:nth-child(3)  { animation-delay:0.15s; }
+.card:nth-child(4)  { animation-delay:0.20s; }
+.card:nth-child(5)  { animation-delay:0.25s; }
+.card:nth-child(6)  { animation-delay:0.30s; }
+.card:nth-child(7)  { animation-delay:0.35s; }
+.card:nth-child(8)  { animation-delay:0.40s; }
+.card:nth-child(9)  { animation-delay:0.45s; }
+.card:nth-child(10) { animation-delay:0.50s; }
+
+/* corner number */
+.card-num {
+  position: absolute; top:12px; right:14px;
+  font-family: var(--display);
+  font-size: 3rem;
+  font-style: italic;
+  color: rgba(232,228,208,0.04);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* EQUATION DISPLAY */
+.eq-display {
+  font-family: var(--mono);
+  font-size: clamp(0.75rem, 1.5vw, 0.92rem);
+  color: var(--amber);
+  background: rgba(0,0,0,0.3);
+  border-left: 3px solid var(--amber);
+  padding: 10px 14px;
+  margin: 12px 0 16px;
+  border-radius: 0 6px 6px 0;
+  line-height: 1.8;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+.eq-display.cyan   { color:var(--cyan);   border-color:var(--cyan); }
+.eq-display.red    { color:var(--red);    border-color:var(--red); }
+.eq-display.blue   { color:var(--blue);   border-color:var(--blue); }
+.eq-display.pink   { color:var(--pink);   border-color:var(--pink); }
+.eq-display.orange { color:var(--orange); border-color:var(--orange); }
+
+/* TITLE */
+.card-title {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--chalk);
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+/* DESC */
+.card-desc {
+  font-size: 0.78rem;
+  color: var(--chalk3);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  font-style: italic;
+}
+.card-desc .snark {
+  color: var(--red);
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+
+/* INPUTS */
+.input-row {
+  display: flex; flex-wrap: wrap;
+  gap: 10px; align-items: flex-end;
+  margin-bottom: 14px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  color: var(--chalk3);
+  text-transform: uppercase;
+}
+
+input[type=number], input[type=text], select {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(232,228,208,0.15);
+  border-radius: 4px;
+  color: var(--chalk);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.2s;
+  -moz-appearance: textfield;
+}
+input[type=number]::-webkit-inner-spin-button { display:none; }
+input[type=number]:focus, input[type=text]:focus, select:focus {
+  border-color: var(--amber);
+}
+select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a8a495'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%; height: 2px;
+  background: rgba(232,228,208,0.15);
+  border-radius: 1px; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--chalk);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.4); }
+
+/* BUTTON */
+.btn {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+}
+.btn:hover { filter: brightness(1.2); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn-amber { color:var(--amber);  border-color:var(--amber); }
+.btn-amber:hover  { background:rgba(255,209,102,0.1); }
+.btn-cyan  { color:var(--cyan);   border-color:var(--cyan); }
+.btn-cyan:hover   { background:rgba(6,214,160,0.1); }
+.btn-red   { color:var(--red);    border-color:var(--red); }
+.btn-red:hover    { background:rgba(255,107,107,0.1); }
+.btn-blue  { color:var(--blue);   border-color:var(--blue); }
+.btn-blue:hover   { background:rgba(78,205,196,0.1); }
+.btn-pink  { color:var(--pink);   border-color:var(--pink); }
+.btn-pink:hover   { background:rgba(255,158,245,0.1); }
+.btn-orange{ color:var(--orange); border-color:var(--orange); }
+.btn-orange:hover { background:rgba(255,154,60,0.1); }
+
+/* RESULT */
+.result {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(232,228,208,0.1);
+  border-radius: 4px;
+  padding: 12px 14px;
+  min-height: 52px;
+  line-height: 1.9;
+  color: var(--chalk2);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.result.pop { animation: pop 0.35s cubic-bezier(0.175,0.885,0.32,1.275); }
+@keyframes pop { 0%{transform:scale(0.97)} 60%{transform:scale(1.01)} 100%{transform:scale(1)} }
+
+.r-big   { display:block; font-size:1.25rem; font-weight:700; color:var(--chalk); margin-bottom:4px; }
+.r-eq    { display:block; font-size:0.72rem; color:var(--amber); margin-bottom:2px; }
+.r-step  { display:block; font-size:0.68rem; color:var(--chalk3); }
+.r-hi    { color:var(--cyan); }
+.r-warn  { color:var(--red); font-weight:700; }
+.r-good  { color:var(--cyan); }
+.r-note  { color:var(--pink); font-style:italic; font-size:0.65rem; display:block; margin-top:4px; }
+
+/* TAYLOR SERIES BARS */
+.series-bars {
+  display:flex; align-items:flex-end; gap:2px; height:60px; margin-top:10px;
+}
+.series-bar {
+  flex:1; border-radius:2px 2px 0 0;
+  transition: height 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  animation: cellIn 0.3s ease both;
+}
+@keyframes cellIn { from{transform:scaleY(0);transform-origin:bottom} to{transform:scaleY(1)} }
+
+/* SCHRODINGER TABLE */
+.sch-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:0.68rem; }
+.sch-table th { color:var(--chalk3); font-weight:400; padding:4px 6px; border-bottom:1px solid rgba(232,228,208,0.1); text-align:left; }
+.sch-table td { padding:4px 6px; border-bottom:1px solid rgba(232,228,208,0.05); }
+.sch-table td.hi { color:var(--cyan); }
+.sch-table td.warn { color:var(--red); }
+
+/* INTEGRAL visual */
+.integral-vis { font-family:var(--mono); font-size:2rem; color:var(--amber); margin-right:4px; vertical-align:middle; }
+
+/* HEADACHE METER */
+.headache-bar {
+  height: 6px;
+  border-radius: 3px;
+  margin-top: 12px;
+  position: relative;
+  background: rgba(232,228,208,0.1);
+  overflow: hidden;
+}
+.headache-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+}
+.headache-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  color: var(--chalk3);
+  text-transform: uppercase;
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 10;
+  text-align: center;
+  padding: 32px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 3px;
+  color: rgba(232,228,208,0.15);
+  text-transform: uppercase;
+  border-top: 1px solid var(--line);
+  margin-top: 2px;
+}
+
+/* slider row */
+.sl-row { display:flex; flex-direction:column; gap:4px; }
+.sl-head { display:flex; justify-content:space-between; }
+.sl-name { font-family:var(--mono); font-size:0.58rem; letter-spacing:2px; color:var(--chalk3); text-transform:uppercase; }
+.sl-val  { font-family:var(--mono); font-size:0.62rem; color:var(--amber); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">The Mathematical Headache Generator</div>
+  <div class="site-sub">serious equations · real calculations · questionable life choices</div>
+  <div class="warning-tape">⚠ Side effects include: existential dread, pencil-chewing, and whispering "but why" at 3am</div>
+</header>
+
+<div class="grid">
+
+<!-- ① SCHWARZSCHILD RADIUS -->
+<div class="card">
+  <div class="card-num">①</div>
+  <div class="card-title">Schwarzschild Radius</div>
+  <div class="card-desc">
+    How small do you need to crush an object before it becomes a black hole?
+    <span class="snark">// Spoiler: the Sun → 3 km. You → about 10⁻²⁵ m. Roughly.</span>
+  </div>
+  <div class="eq-display">r_s = 2GM / c²
+
+G = 6.674×10⁻¹¹ N·m²/kg²
+c = 299,792,458 m/s</div>
+  <div class="input-row">
+    <div class="field">
+      <label>Mass (kg)</label>
+      <input type="number" id="bh-m" value="1.989e30" style="width:140px">
+    </div>
+    <div class="field" style="gap:4px">
+      <label>Or pick one</label>
+      <select id="bh-preset" onchange="bhPreset()" style="width:140px">
+        <option value="">— custom —</option>
+        <option value="1.989e30">☀️ Sun</option>
+        <option value="5.972e24">🌍 Earth</option>
+        <option value="7.342e22">🌕 Moon</option>
+        <option value="70">🧑 Human (70 kg)</option>
+        <option value="9.11e-31">⚛️ Electron</option>
+        <option value="1.989e41">🌌 Milky Way</option>
+      </select>
+    </div>
+    <button class="btn btn-red" onclick="doBlackHole()">CRUSH IT</button>
+  </div>
+  <div class="result" id="bh-result"><span style="color:var(--chalk3)">Pick a mass and crush it into a black hole.</span></div>
+</div>
+
+<!-- ② LORENTZ FACTOR / TIME DILATION -->
+<div class="card">
+  <div class="card-num">②</div>
+  <div class="card-title">Time Dilation (Special Relativity)</div>
+  <div class="card-desc">
+    Moving clocks run slow. The faster you go, the younger you stay. Nature's anti-ageing cream.
+    <span class="snark">// At 99.9% c, 1 year for you = 22.4 years back home.</span>
+  </div>
+  <div class="eq-display cyan">Δt' = Δt / √(1 − v²/c²)
+
+γ (Lorentz factor) = 1/√(1 − β²)
+β = v/c</div>
+  <div class="input-row">
+    <div class="field" style="flex:1">
+      <div class="sl-row">
+        <div class="sl-head">
+          <span class="sl-name">Speed: <span id="lor-pct">90</span>% of c</span>
+          <span class="sl-val" id="lor-ms">—</span>
+        </div>
+        <input type="range" id="lor-v" min="1" max="99.9999" step="0.0001" value="90" oninput="doLorentz()">
+      </div>
+    </div>
+  </div>
+  <div class="input-row">
+    <div class="field">
+      <label>Your trip (years)</label>
+      <input type="number" id="lor-t" value="1" min="0.01" step="0.1" style="width:90px">
+    </div>
+    <button class="btn btn-cyan" onclick="doLorentz()">DILATE</button>
+  </div>
+  <div class="result" id="lor-result"><span style="color:var(--chalk3)">Drag the slider to start ageing differently.</span></div>
+</div>
+
+<!-- ③ TAYLOR SERIES — e^x -->
+<div class="card">
+  <div class="card-num">③</div>
+  <div class="card-title">Taylor Series for eˣ</div>
+  <div class="card-desc">
+    Approximate eˣ by adding up infinitely many polynomial terms. Watch it converge. Watch it fail. Watch it converge again.
+    <span class="snark">// More terms = less lying.</span>
+  </div>
+  <div class="eq-display blue">eˣ = Σ(n=0→∞) xⁿ/n!
+   = 1 + x + x²/2! + x³/3! + x⁴/4! + …</div>
+  <div class="input-row">
+    <div class="field">
+      <label>x</label>
+      <input type="number" id="tay-x" value="2" step="0.1" style="width:80px">
+    </div>
+    <div class="field" style="flex:1">
+      <div class="sl-row">
+        <div class="sl-head">
+          <span class="sl-name">Terms</span>
+          <span class="sl-val" id="tay-terms-val">8</span>
+        </div>
+        <input type="range" id="tay-terms" min="1" max="20" value="8" oninput="document.getElementById('tay-terms-val').textContent=this.value; doTaylor()">
+      </div>
+    </div>
+    <button class="btn btn-blue" onclick="doTaylor()">APPROXIMATE</button>
+  </div>
+  <div class="series-bars" id="tay-bars"></div>
+  <div class="result" id="tay-result" style="margin-top:8px"><span style="color:var(--chalk3)">Enter x and number of terms.</span></div>
+</div>
+
+<!-- ④ SCHRÖDINGER'S HYDROGEN ATOM -->
+<div class="card">
+  <div class="card-num">④</div>
+  <div class="card-title">Hydrogen Energy Levels</div>
+  <div class="card-desc">
+    Electrons in hydrogen don't orbit — they exist in probability clouds at discrete energy levels. Pick a shell. Receive existential dread.
+    <span class="snark">// n=1 is ground state. There is no n=0. The universe says no.</span>
+  </div>
+  <div class="eq-display pink">Eₙ = −13.6 eV / n²
+
+λ (photon) = hc / |ΔE|
+ΔE = E_final − E_initial</div>
+  <div class="input-row">
+    <div class="field">
+      <label>n₁ (initial shell)</label>
+      <input type="number" id="sch-n1" value="3" min="1" max="10" style="width:70px">
+    </div>
+    <div class="field">
+      <label>n₂ (final shell)</label>
+      <input type="number" id="sch-n2" value="1" min="1" max="10" style="width:70px">
+    </div>
+    <button class="btn btn-pink" onclick="doSchrodinger()">COLLAPSE WAVE</button>
+  </div>
+  <div class="result" id="sch-result"><span style="color:var(--chalk3)">Pick two shells and collapse the wave function.</span></div>
+</div>
+
+<!-- ⑤ FOURIER SERIES — SQUARE WAVE -->
+<div class="card">
+  <div class="card-num">⑤</div>
+  <div class="card-title">Fourier Series (Square Wave)</div>
+  <div class="card-desc">
+    A square wave is just infinitely many sine waves stacked on top of each other. This should not be legal. It is.
+    <span class="snark">// Adding enough sines makes sharp corners. Physics has no shame.</span>
+  </div>
+  <div class="eq-display orange">f(x) = (4/π) Σ(n=1,3,5…) sin(nπx/L) / n
+
+Gibbs phenomenon: overshoot ≈ 8.9%
+(never goes away, even with ∞ terms)</div>
+  <div class="input-row">
+    <div class="field" style="flex:1">
+      <div class="sl-row">
+        <div class="sl-head">
+          <span class="sl-name">Harmonics</span>
+          <span class="sl-val" id="four-n-val">7</span>
+        </div>
+        <input type="range" id="four-n" min="1" max="50" value="7" oninput="document.getElementById('four-n-val').textContent=this.value; doFourier()">
+      </div>
+    </div>
+    <div class="field">
+      <label>x</label>
+      <input type="number" id="four-x" value="0.25" step="0.05" style="width:80px">
+    </div>
+    <button class="btn btn-orange" onclick="doFourier()">SYNTHESISE</button>
+  </div>
+  <div id="four-canvas-wrap" style="margin:10px 0">
+    <canvas id="four-canvas" height="80" style="width:100%;border-radius:4px;background:rgba(0,0,0,0.3)"></canvas>
+  </div>
+  <div class="result" id="four-result"><span style="color:var(--chalk3)">Drag harmonics slider to build the square wave.</span></div>
+</div>
+
+<!-- ⑥ EULER'S IDENTITY (interactive proof) -->
+<div class="card">
+  <div class="card-num">⑥</div>
+  <div class="card-title">Euler's Identity — Unpacked</div>
+  <div class="card-desc">
+    e^(iπ) + 1 = 0. Five fundamental constants. One equation. Mathematicians weep. You will too.
+    <span class="snark">// Rotate any θ on the complex plane. At θ=π you land exactly at −1. Every. Single. Time.</span>
+  </div>
+  <div class="eq-display">e^(iθ) = cos(θ) + i·sin(θ)
+
+At θ = π:  e^(iπ) = −1 + 0i
+Therefore: e^(iπ) + 1 = 0  ✓</div>
+  <div class="input-row">
+    <div class="field" style="flex:1">
+      <div class="sl-row">
+        <div class="sl-head">
+          <span class="sl-name">θ (radians)</span>
+          <span class="sl-val" id="euler-θ-val">π</span>
+        </div>
+        <input type="range" id="euler-θ" min="0" max="6.2832" step="0.0001" value="3.14159" oninput="doEuler()">
+      </div>
+    </div>
+  </div>
+  <canvas id="euler-canvas" width="300" height="150" style="width:100%;border-radius:4px;background:rgba(0,0,0,0.3);margin:8px 0"></canvas>
+  <div class="result" id="euler-result"><span style="color:var(--chalk3)">Drag θ and watch the unit circle rotate.</span></div>
+</div>
+
+<!-- ⑦ NAVIER-STOKES (simplified) -->
+<div class="card">
+  <div class="card-num">⑦</div>
+  <div class="card-title">Navier-Stokes (Simplified)</div>
+  <div class="card-desc">
+    The equation of fluid motion. Worth $1,000,000 if you solve it properly. You won't. Neither will we.
+    <span class="snark">// This is the laminar flow version. Turbulence would require more pixels than exist.</span>
+  </div>
+  <div class="eq-display red">ρ(∂u/∂t + u·∇u) = −∇p + μ∇²u + ρg
+
+Simplified: pipe flow (Hagen-Poiseuille)
+Q = πr⁴ΔP / (8μL)</div>
+  <div class="input-row">
+    <div class="field">
+      <label>Radius r (m)</label>
+      <input type="number" id="ns-r" value="0.01" step="0.001" min="0.001" style="width:90px">
+    </div>
+    <div class="field">
+      <label>ΔPressure (Pa)</label>
+      <input type="number" id="ns-dp" value="1000" min="1" style="width:90px">
+    </div>
+    <div class="field">
+      <label>Length (m)</label>
+      <input type="number" id="ns-l" value="1" min="0.01" step="0.1" style="width:80px">
+    </div>
+  </div>
+  <div class="input-row">
+    <div class="field" style="width:120px">
+      <label>Fluid</label>
+      <select id="ns-fluid" onchange="doNavierStokes()">
+        <option value="0.001">💧 Water</option>
+        <option value="0.0181">🌬️ Air</option>
+        <option value="1.0">🍯 Honey</option>
+        <option value="0.0006">🩸 Blood</option>
+        <option value="100">🫙 Ketchup</option>
+      </select>
+    </div>
+    <button class="btn btn-red" onclick="doNavierStokes()">FLOW!</button>
+  </div>
+  <div class="result" id="ns-result"><span style="color:var(--chalk3)">Set pipe params and calculate flow rate.</span></div>
+</div>
+
+<!-- ⑧ SHANNON ENTROPY -->
+<div class="card">
+  <div class="card-num">⑧</div>
+  <div class="card-title">Shannon Entropy</div>
+  <div class="card-desc">
+    How surprising is a message? How much information does it contain? Type anything and find out how boring you are.
+    <span class="snark">// "aaaaaaa" has 0 bits of entropy. You knew what was coming.</span>
+  </div>
+  <div class="eq-display cyan">H = −Σ p(x) · log₂(p(x))
+
+Measured in bits. Maximum entropy =
+log₂(alphabet_size) bits per symbol.</div>
+  <div class="input-row" style="flex-direction:column; gap:8px">
+    <div class="field" style="width:100%">
+      <label>Type something (any text)</label>
+      <input type="text" id="shan-text" value="Hello World" style="width:100%" oninput="doShannon()">
+    </div>
+  </div>
+  <div class="result" id="shan-result"><span style="color:var(--chalk3)">Start typing above!</span></div>
+</div>
+
+<!-- ⑨ ESCAPE VELOCITY -->
+<div class="card">
+  <div class="card-num">⑨</div>
+  <div class="card-title">Escape Velocity</div>
+  <div class="card-desc">
+    How fast do you need to throw something to leave a planet forever, ignoring air resistance and your arm strength?
+    <span class="snark">// Earth: 11.2 km/s. A bullet does ~0.9 km/s. Nice try.</span>
+  </div>
+  <div class="eq-display orange">v_esc = √(2GM/r)
+
+G = 6.674×10⁻¹¹ N·m²/kg²
+Kinetic energy needed: ½mv² = GMm/r</div>
+  <div class="input-row">
+    <div class="field">
+      <label>Or pick a body</label>
+      <select id="esc-preset" onchange="escPreset()" style="width:160px">
+        <option value="5.972e24,6.371e6">🌍 Earth</option>
+        <option value="1.989e30,6.96e8">☀️ Sun</option>
+        <option value="7.342e22,1.737e6">🌕 Moon</option>
+        <option value="6.39e23,3.39e6">♂️ Mars</option>
+        <option value="1.9e27,7.15e7">♃ Jupiter</option>
+        <option value="8.1e5,600">🪐 Asteroid Bennu</option>
+        <option value="custom,custom">✏️ Custom…</option>
+      </select>
+    </div>
+  </div>
+  <div class="input-row" id="esc-custom" style="display:none">
+    <div class="field">
+      <label>Mass (kg)</label>
+      <input type="number" id="esc-m" value="5.972e24" style="width:110px">
+    </div>
+    <div class="field">
+      <label>Radius (m)</label>
+      <input type="number" id="esc-r" value="6.371e6" style="width:110px">
+    </div>
+  </div>
+  <button class="btn btn-orange" onclick="doEscape()" style="margin-bottom:12px">LAUNCH!</button>
+  <div class="result" id="esc-result"><span style="color:var(--chalk3)">Select a body and calculate!</span></div>
+</div>
+
+<!-- ⑩ RIEMANN ZETA FUNCTION -->
+<div class="card">
+  <div class="card-num">⑩</div>
+  <div class="card-title">Riemann Zeta Function</div>
+  <div class="card-desc">
+    ζ(s) = 1 + 1/2ˢ + 1/3ˢ + 1/4ˢ + … The zeros of this function hold the key to prime numbers. Nobody knows where all the zeros are. $1M prize. Good luck.
+    <span class="snark">// ζ(−1) = −1/12. Yes, 1+2+3+4+… = −1/12. No, this is not a joke.</span>
+  </div>
+  <div class="eq-display pink">ζ(s) = Σ(n=1→∞) 1/nˢ   (Re(s) > 1)
+
+Special values:
+ζ(2) = π²/6 ≈ 1.6449  (Basel problem!)
+ζ(4) = π⁴/90 ≈ 1.0823</div>
+  <div class="input-row">
+    <div class="field">
+      <label>s (real, s > 1)</label>
+      <input type="number" id="zeta-s" value="2" min="1.01" max="20" step="0.01" style="width:90px">
+    </div>
+    <div class="field" style="flex:1">
+      <div class="sl-row">
+        <div class="sl-head">
+          <span class="sl-name">Terms</span>
+          <span class="sl-val" id="zeta-n-val">1000</span>
+        </div>
+        <input type="range" id="zeta-n" min="10" max="10000" step="10" value="1000" oninput="document.getElementById('zeta-n-val').textContent=Number(this.value).toLocaleString(); doZeta()">
+      </div>
+    </div>
+    <button class="btn btn-pink" onclick="doZeta()">SUM IT</button>
+  </div>
+  <div class="result" id="zeta-result"><span style="color:var(--chalk3)">Try s=2 for the Basel problem (answer involves π).</span></div>
+</div>
+
+</div>
+
+<footer>Mathematical Headache Generator · All equations 100% correct · Side effects not covered by warranty</footer>
+
+<script>
+// ── constants ──
+const G  = 6.674e-11;
+const C  = 299792458;
+const H  = 6.626e-34;
+const EV = 1.602e-19;
+const PI = Math.PI;
+
+// ── helper ──
+function pop(id, html) {
+  const el = document.getElementById(id);
+  el.innerHTML = html;
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+function sci(n, dp=4) {
+  if (!isFinite(n)) return '<span class="r-warn">∞</span>';
+  if (n === 0) return '0';
+  const e = Math.floor(Math.log10(Math.abs(n)));
+  if (Math.abs(e) < 4) return n.toPrecision(dp);
+  return n.toExponential(dp-1);
+}
+
+function headache(pct, label) {
+  const color = pct < 30 ? '#6bcb77' : pct < 60 ? '#ffd166' : pct < 85 ? '#ff9a3c' : '#ff6b6b';
+  return `<div class="headache-bar"><div class="headache-fill" style="width:${pct}%;background:${color}"></div></div>
+  <div class="headache-label"><span>HEADACHE LEVEL</span><span style="color:${color}">${label}</span></div>`;
+}
+
+// ① SCHWARZSCHILD RADIUS
+function bhPreset() {
+  const v = document.getElementById('bh-preset').value;
+  if(v) document.getElementById('bh-m').value = v;
+  doBlackHole();
+}
+function doBlackHole() {
+  const M = parseFloat(document.getElementById('bh-m').value);
+  if (!M || M <= 0) return;
+  const rs = 2 * G * M / (C * C);
+  const solarMasses = M / 1.989e30;
+  const compare = rs < 1e-15 ? `${sci(rs/1e-15,3)} femtometres (smaller than a proton!)` :
+                  rs < 1e-6  ? `${sci(rs*1e9,4)} nm` :
+                  rs < 1     ? `${(rs*100).toPrecision(4)} cm` :
+                  rs < 1000  ? `${rs.toPrecision(4)} m` :
+                               `${(rs/1000).toPrecision(4)} km`;
+
+  const density = (3*M)/(4*PI*rs*rs*rs);
+  const hPct = Math.min(99, 20 + Math.log10(Math.max(1,solarMasses))*20);
+
+  pop('bh-result', `
+    <span class="r-big">r<sub>s</sub> = ${sci(rs)} m</span>
+    <span class="r-eq">= ${compare}</span>
+    <span class="r-step">Mass: ${sci(M)} kg (${sci(solarMasses,3)} solar masses)</span>
+    <span class="r-step">Density if crushed: ${sci(density)} kg/m³</span>
+    <span class="r-step r-hi">Escape velocity at surface = c (speed of light)</span>
+    ${headache(hPct, rs < 1e-20 ? 'Existential Crisis' : rs < 1 ? 'Significant' : 'Moderate')}
+  `);
+}
+
+// ② LORENTZ / TIME DILATION
+function doLorentz() {
+  const beta = parseFloat(document.getElementById('lor-v').value) / 100;
+  const t_you = parseFloat(document.getElementById('lor-t').value) || 1;
+  document.getElementById('lor-pct').textContent = parseFloat(document.getElementById('lor-v').value).toFixed(4);
+  document.getElementById('lor-ms').textContent = sci(beta*C,4) + ' m/s';
+
+  if (beta >= 1) { pop('lor-result','<span class="r-warn">β ≥ 1: You ARE light. No mass allowed.</span>'); return; }
+
+  const gamma = 1 / Math.sqrt(1 - beta*beta);
+  const t_home = t_you * gamma;
+  const age_diff = t_home - t_you;
+  const mass_factor = gamma;
+
+  const hPct = Math.min(99, (beta*100 - 50) * 2);
+
+  pop('lor-result', `
+    <span class="r-big">γ = ${gamma.toFixed(6)}</span>
+    <span class="r-eq">You age: ${t_you} yr → Home ages: ${t_home.toFixed(4)} yr</span>
+    <span class="r-step">You're <span class="r-hi">${age_diff.toFixed(4)} years younger</span> than if you'd stayed</span>
+    <span class="r-step">Your relativistic mass: ${mass_factor.toFixed(4)}× rest mass</span>
+    <span class="r-step">Length contraction: objects appear ${(1/gamma*100).toFixed(3)}% of rest length</span>
+    <span class="r-note">At β→1: γ→∞, time stops, mass→∞, length→0. Physics throws a tantrum.</span>
+    ${headache(Math.max(5, hPct), gamma > 10 ? '🤯 Brain Melting' : gamma > 2 ? 'Considerable' : 'Manageable')}
+  `);
+}
+
+// ③ TAYLOR SERIES
+function doTaylor() {
+  const x = parseFloat(document.getElementById('tay-x').value) || 2;
+  const n = parseInt(document.getElementById('tay-terms').value) || 8;
+  const exact = Math.exp(x);
+
+  let sum = 0, terms = [], factorials = [1];
+  for (let i = 1; i <= n; i++) factorials.push(factorials[i-1] * i);
+
+  for (let i = 0; i <= n-1; i++) {
+    const term = Math.pow(x, i) / factorials[i];
+    sum += term;
+    terms.push({ i, term, sum });
+  }
+
+  const error = Math.abs(exact - sum);
+  const errPct = (error / exact * 100);
+
+  // Draw bars
+  const bars = document.getElementById('tay-bars');
+  bars.innerHTML = '';
+  const maxTerm = Math.max(...terms.map(t=>Math.abs(t.term)));
+  const colors = ['#4ecdc4','#06d6a0','#ffd166','#ff9a3c','#ff6b6b','#c77dff','#ff9ef5','#4d96ff'];
+  terms.forEach((t,i) => {
+    const b = document.createElement('div');
+    b.className='series-bar';
+    b.style.height = Math.max(3, Math.abs(t.term)/maxTerm*55) + 'px';
+    b.style.background = colors[i%colors.length];
+    b.style.animationDelay = i*0.04+'s';
+    b.title = `Term ${i}: ${t.term.toFixed(6)}`;
+    bars.appendChild(b);
+  });
+
+  pop('tay-result', `
+    <span class="r-big">≈ ${sum.toPrecision(10)}</span>
+    <span class="r-eq">Exact e^${x} = ${exact.toPrecision(10)}</span>
+    <span class="r-step">Error: ${sci(error)} <span class="${errPct<0.001?'r-good':'r-warn'}">(${errPct.toExponential(2)}%)</span></span>
+    <span class="r-step">Largest term: x^${terms.reduce((a,b)=>Math.abs(a.term)>Math.abs(b.term)?a:b).i}/${terms[0]?'0!':''}</span>
+    <span class="r-note">Each bar = one term of the series. More bars = less lying to you.</span>
+    ${headache(Math.min(95, errPct < 0.001 ? 15 : errPct < 1 ? 40 : 70), errPct < 0.001 ? 'Converged ✓' : errPct < 1 ? 'Almost there' : 'Still lying')}
+  `);
+}
+
+// ④ HYDROGEN ENERGY LEVELS
+function doSchrodinger() {
+  const n1 = parseInt(document.getElementById('sch-n1').value) || 3;
+  const n2 = parseInt(document.getElementById('sch-n2').value) || 1;
+  if (n1 < 1 || n2 < 1 || n1 === n2) {
+    pop('sch-result','<span class="r-warn">n must be ≥ 1 and n1 ≠ n2</span>'); return;
+  }
+  const E = n => -13.6 / (n*n);
+  const E1 = E(n1), E2 = E(n2);
+  const dE = E2 - E1;  // eV
+  const dE_J = dE * EV;
+  const lambda = Math.abs(H * C / dE_J); // metres
+  const lambda_nm = lambda * 1e9;
+
+  const series = n2===1?'Lyman (UV)':n2===2?'Balmer (visible)':n2===3?'Paschen (IR)':'higher series';
+
+  // Colour of photon (rough visible range)
+  let photonColor = '#ffffff';
+  if(lambda_nm >= 380 && lambda_nm < 450) photonColor = '#8080ff';
+  else if(lambda_nm < 495) photonColor = '#4080ff';
+  else if(lambda_nm < 570) photonColor = '#40ff40';
+  else if(lambda_nm < 590) photonColor = '#ffff00';
+  else if(lambda_nm < 620) photonColor = '#ff8000';
+  else if(lambda_nm <= 750) photonColor = '#ff4040';
+
+  const emitting = dE < 0;
+
+  pop('sch-result', `
+    <span class="r-big">λ = ${lambda_nm.toFixed(2)} nm</span>
+    <span class="r-eq">E(${n1}) = ${E1.toFixed(4)} eV  →  E(${n2}) = ${E2.toFixed(4)} eV</span>
+    <span class="r-step">ΔE = <span class="r-hi">${Math.abs(dE).toFixed(4)} eV</span> ${emitting?'(photon emitted)':'(photon absorbed)'}</span>
+    <span class="r-step">Series: <span class="r-hi">${series}</span></span>
+    <span class="r-step">Photon colour: <span style="color:${photonColor};font-weight:700">■ ${lambda_nm<380?'UV (invisible)':lambda_nm>750?'IR (invisible)':lambda_nm.toFixed(0)+' nm'}</span></span>
+    ${headache(55, 'Quantum Unsettling')}
+  `);
+}
+
+// ⑤ FOURIER SERIES
+function doFourier() {
+  const N = parseInt(document.getElementById('four-n').value) || 7;
+  const x = parseFloat(document.getElementById('four-x').value) || 0.25;
+  const L = 1.0;
+
+  // Approximate f(x) at point x
+  let sum = 0;
+  for (let k = 0; k < N; k++) {
+    const n = 2*k+1;
+    sum += Math.sin(n*PI*x/L) / n;
+  }
+  sum *= 4/PI;
+
+  // Draw wave on canvas
+  const canvas = document.getElementById('four-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * (window.devicePixelRatio||1);
+  canvas.height = 80 * (window.devicePixelRatio||1);
+  ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+
+  const W = canvas.offsetWidth, H2 = 40;
+  ctx.clearRect(0,0,W,80);
+
+  // True square wave
+  ctx.beginPath(); ctx.strokeStyle='rgba(232,228,208,0.15)'; ctx.lineWidth=1;
+  for(let px=0;px<W;px++) {
+    const t=px/W;
+    const y=H2-(t<0.5?1:-1)*25;
+    px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+  }
+  ctx.stroke();
+
+  // Fourier approximation
+  ctx.beginPath(); ctx.strokeStyle='#ffd166'; ctx.lineWidth=1.5;
+  for(let px=0;px<W;px++) {
+    const t=px/W*2; // 0..2 periods
+    let fy=0;
+    for(let k=0;k<N;k++){const n=2*k+1; fy+=Math.sin(n*PI*t)/n;}
+    fy*=4/PI;
+    const y=H2-fy*25;
+    px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+  }
+  ctx.stroke();
+
+  // x marker
+  ctx.beginPath(); ctx.strokeStyle='#06d6a0'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.moveTo(x*W/2,0); ctx.lineTo(x*W/2,80); ctx.stroke(); ctx.setLineDash([]);
+
+  const sq_exact = x < L ? 1 : -1;
+  const error = Math.abs(sq_exact - sum);
+
+  pop('four-result', `
+    <span class="r-big">f(${x}) ≈ ${sum.toFixed(6)}</span>
+    <span class="r-eq">Exact square wave value: ${sq_exact > 0 ? '+1':'-1'}</span>
+    <span class="r-step">Error with ${N} harmonic${N>1?'s':''}: <span class="r-hi">${error.toFixed(6)}</span></span>
+    <span class="r-step">Gibbs overshoot: ${N>5?'~8.9% (inescapable)':'visible — add more harmonics'}</span>
+    <span class="r-note">Yellow = Fourier approximation. Grey = true square wave. Green line = your x.</span>
+    ${headache(Math.min(90, 30+N*2), N>20?'Sinusoidally Overwhelming':'Harmonic Discomfort')}
+  `);
+}
+
+// ⑥ EULER'S IDENTITY
+function doEuler() {
+  const theta = parseFloat(document.getElementById('euler-θ').value);
+  const re = Math.cos(theta);
+  const im = Math.sin(theta);
+
+  // Label
+  const frac = theta/PI;
+  let label;
+  if(Math.abs(frac-1)<0.001) label='π';
+  else if(Math.abs(frac-2)<0.001) label='2π';
+  else if(Math.abs(frac-0.5)<0.001) label='π/2';
+  else if(Math.abs(frac-1.5)<0.001) label='3π/2';
+  else label=theta.toFixed(4);
+  document.getElementById('euler-θ-val').textContent=label;
+
+  // Draw unit circle
+  const canvas = document.getElementById('euler-canvas');
+  const ctx = canvas.getContext('2d');
+  const DPR = window.devicePixelRatio||1;
+  canvas.width = canvas.offsetWidth*DPR;
+  canvas.height = 150*DPR;
+  ctx.scale(DPR,DPR);
+  const W=canvas.offsetWidth, H=150, cx=W/2, cy=H/2, R=55;
+
+  ctx.clearRect(0,0,W,H);
+
+  // axes
+  ctx.strokeStyle='rgba(232,228,208,0.12)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(cx-R-15,cy); ctx.lineTo(cx+R+15,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,cy-R-15); ctx.lineTo(cx,cy+R+15); ctx.stroke();
+
+  // unit circle
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,2*PI);
+  ctx.strokeStyle='rgba(232,228,208,0.2)'; ctx.lineWidth=1; ctx.stroke();
+
+  // arc from 0 to θ
+  ctx.beginPath(); ctx.arc(cx,cy,R*0.35,0,-theta,theta>0);
+  ctx.strokeStyle='rgba(255,209,102,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // radius arm
+  const px=cx+R*re, py=cy-R*im;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px,py);
+  ctx.strokeStyle='#ffd166'; ctx.lineWidth=2; ctx.stroke();
+
+  // real component (dashed)
+  ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,cy);
+  ctx.strokeStyle='rgba(78,205,196,0.6)'; ctx.lineWidth=1; ctx.setLineDash([3,3]); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px,cy);
+  ctx.strokeStyle='rgba(255,107,107,0.6)'; ctx.stroke(); ctx.setLineDash([]);
+
+  // point
+  ctx.beginPath(); ctx.arc(px,py,4,0,2*PI);
+  ctx.fillStyle='#ffd166'; ctx.fill();
+
+  // labels
+  ctx.font=`${10*DPR/DPR}px Fira Code`; ctx.fillStyle='rgba(232,228,208,0.5)'; ctx.textAlign='center';
+  ctx.fillText('+1',cx+R+10,cy+12);
+  ctx.fillText('−1',cx-R-10,cy+12);
+  ctx.fillText('+i',cx+4,cy-R-5);
+  ctx.fillText('−i',cx+4,cy+R+12);
+
+  const result_str = `${re.toFixed(6)} + ${im.toFixed(6)}i`;
+  const isIdentity = Math.abs(theta - PI) < 0.001;
+
+  pop('euler-result', `
+    <span class="r-big">e^(i·${label}) = ${re.toFixed(6)} + ${im.toFixed(6)}i</span>
+    <span class="r-eq">|e^(iθ)| = √(${(re*re).toFixed(4)} + ${(im*im).toFixed(4)}) = ${Math.sqrt(re*re+im*im).toFixed(6)}</span>
+    <span class="r-step">Re = cos(${label}) = <span class="r-hi">${re.toFixed(6)}</span></span>
+    <span class="r-step">Im = sin(${label}) = <span class="r-hi">${im.toFixed(6)}</span></span>
+    ${isIdentity?'<span class="r-warn">e^(iπ) + 1 = '+( re+1).toFixed(10)+' ≈ 0 ✓✓✓</span>':''}
+    ${headache(isIdentity?99:45, isIdentity?'🤯 Maximum Beauty':'Geometrically Disturbing')}
+  `);
+}
+
+// ⑦ NAVIER-STOKES / HAGEN-POISEUILLE
+function doNavierStokes() {
+  const r  = parseFloat(document.getElementById('ns-r').value)  || 0.01;
+  const dp = parseFloat(document.getElementById('ns-dp').value) || 1000;
+  const L  = parseFloat(document.getElementById('ns-l').value)  || 1;
+  const mu = parseFloat(document.getElementById('ns-fluid').value);
+  const fluid = document.getElementById('ns-fluid').options[document.getElementById('ns-fluid').selectedIndex].text;
+
+  // Hagen-Poiseuille
+  const Q = (PI * Math.pow(r,4) * dp) / (8 * mu * L);
+  const v_max = (r*r * dp) / (4 * mu * L);  // max velocity at centre
+  const v_avg = v_max / 2;  // parabolic profile
+  const Re = (1000 * v_avg * 2*r) / mu; // Reynolds number (water density approx)
+
+  const turbulent = Re > 4000;
+  const transitional = Re > 2300 && Re <= 4000;
+
+  pop('ns-result', `
+    <span class="r-big">Q = ${sci(Q)} m³/s</span>
+    <span class="r-eq">= ${sci(Q*1000)} litres/s = ${sci(Q*1000*60)} litres/min</span>
+    <span class="r-step">Max velocity (centre): <span class="r-hi">${sci(v_max)} m/s</span></span>
+    <span class="r-step">Average velocity: ${sci(v_avg)} m/s</span>
+    <span class="r-step">Reynolds number: <span class="${turbulent?'r-warn':transitional?'r-hi':'r-good'}">${Re.toFixed(0)} → ${turbulent?'TURBULENT (Navier-Stokes breaks down 💀)':transitional?'Transitional (chaos approaching)':'Laminar ✓'}</span></span>
+    <span class="r-note">${turbulent?'Flow is turbulent. The $1M Millennium Prize equation now applies. Good luck.':'Laminar flow: fluid moves in parallel layers like a well-behaved student.'}</span>
+    ${headache(turbulent?95:transitional?60:25, turbulent?'Turbulent Nightmare':'Smooth (for now)')}
+  `);
+}
+
+// ⑧ SHANNON ENTROPY
+function doShannon() {
+  const text = document.getElementById('shan-text').value;
+  if(!text) { pop('shan-result','<span style="color:var(--chalk3)">Type something!</span>'); return; }
+
+  const freq = {};
+  for(const ch of text) freq[ch] = (freq[ch]||0)+1;
+  const n = text.length;
+  let H = 0;
+  const probs = [];
+  for(const [ch, cnt] of Object.entries(freq)) {
+    const p = cnt/n;
+    H -= p * Math.log2(p);
+    probs.push({ch, p, cnt});
+  }
+  probs.sort((a,b)=>b.p-a.p);
+
+  const maxH = Math.log2(Object.keys(freq).length);
+  const efficiency = (H/maxH*100);
+  const bits_total = H * n;
+  const hPct = efficiency;
+
+  pop('shan-result', `
+    <span class="r-big">H = ${H.toFixed(6)} bits/symbol</span>
+    <span class="r-eq">Total information: ${bits_total.toFixed(2)} bits for ${n} chars</span>
+    <span class="r-step">Alphabet size: ${Object.keys(freq).length} unique symbols</span>
+    <span class="r-step">Max possible entropy: ${maxH.toFixed(4)} bits → Efficiency: <span class="r-hi">${efficiency.toFixed(1)}%</span></span>
+    <span class="r-step">Most frequent: '${probs[0].ch}' (p=${probs[0].p.toFixed(3)}), least: '${probs[probs.length-1].ch}' (p=${probs[probs.length-1].p.toFixed(3)})</span>
+    <span class="r-note">${H < 1 ? 'Very predictable text. Boring. 0 stars.' : H < 3 ? 'Moderately informative.' : H > 4.5 ? 'High entropy! Dense information.' : 'Good entropy. English prose usually ~4 bits.'}</span>
+    ${headache(Math.round(hPct), H>4?'Information Overload':H<1?'Practically Zero':'Moderate')}
+  `);
+}
+
+// ⑨ ESCAPE VELOCITY
+let esc_M = 5.972e24, esc_R = 6.371e6;
+function escPreset() {
+  const val = document.getElementById('esc-preset').value;
+  const custom = document.getElementById('esc-custom');
+  if(val === 'custom,custom') {
+    custom.style.display='flex'; return;
+  }
+  custom.style.display='none';
+  const parts = val.split(',');
+  esc_M = parseFloat(parts[0]);
+  esc_R = parseFloat(parts[1]);
+  doEscape();
+}
+function doEscape() {
+  const sel = document.getElementById('esc-preset').value;
+  if(sel === 'custom,custom') {
+    esc_M = parseFloat(document.getElementById('esc-m').value);
+    esc_R = parseFloat(document.getElementById('esc-r').value);
+  }
+  const v = Math.sqrt(2*G*esc_M/esc_R);
+  const v_kmh = v * 3.6;
+  const earth_v = 11186; // m/s
+  const bullet = 900;
+  const sound = 343;
+  const KE_70kg = 0.5 * 70 * v * v;
+
+  pop('esc-result', `
+    <span class="r-big">v<sub>esc</sub> = ${(v/1000).toFixed(3)} km/s</span>
+    <span class="r-eq">= ${v_kmh.toFixed(0).toLocaleString()} km/h = ${(v/sound).toFixed(1)} Mach</span>
+    <span class="r-step">vs Earth: <span class="r-hi">${(v/earth_v).toFixed(3)}×</span> Earth's escape velocity</span>
+    <span class="r-step">vs bullet: <span class="r-hi">${(v/bullet).toFixed(1)}×</span> faster than a rifle bullet</span>
+    <span class="r-step">KE for 70 kg human: <span class="r-hi">${sci(KE_70kg)} J</span> = ${sci(KE_70kg/4.184e6)} tonnes of TNT</span>
+    ${v > C ? '<span class="r-warn">v > c: Black hole confirmed. Nothing escapes.</span>' : ''}
+    ${headache(Math.min(95, v/earth_v*15 + 20), v > 1e7 ? 'Do NOT attempt' : v > earth_v ? 'Ambitious' : 'Feasible-ish')}
+  `);
+}
+
+// ⑩ RIEMANN ZETA
+function doZeta() {
+  const s = parseFloat(document.getElementById('zeta-s').value) || 2;
+  const N = parseInt(document.getElementById('zeta-n').value) || 1000;
+
+  if(s <= 1) { pop('zeta-result','<span class="r-warn">s must be > 1 for convergence. At s=1 it diverges to ∞ (harmonic series). Try s=1.001 if you like danger.</span>'); return; }
+
+  let sum = 0;
+  for(let n=1; n<=N; n++) sum += 1/Math.pow(n,s);
+
+  // Known exact values
+  const exact = {
+    2: PI*PI/6,
+    4: Math.pow(PI,4)/90,
+    6: Math.pow(PI,6)/945,
+    8: Math.pow(PI,8)/9450,
+  };
+  const exactVal = exact[Math.round(s)];
+  const isSpecial = exactVal && Math.abs(s - Math.round(s)) < 0.01;
+
+  const error = isSpecial ? Math.abs(sum - exactVal) : null;
+
+  pop('zeta-result', `
+    <span class="r-big">ζ(${s}) ≈ ${sum.toPrecision(10)}</span>
+    ${isSpecial ? `<span class="r-eq">Exact value: π^${Math.round(s)}/${[6,90,945,9450][Math.round(s)/2-1]} = ${exactVal.toPrecision(10)}</span>` : ''}
+    ${error!==null ? `<span class="r-step">Error with ${N.toLocaleString()} terms: <span class="r-hi">${sci(error)}</span></span>` : ''}
+    <span class="r-step">Sum of first 5: ${[1,2,3,4,5].map(n=>`1/${n}^${s}=${(1/Math.pow(n,s)).toFixed(4)}`).join(' + ')}</span>
+    ${Math.abs(s-2)<0.01?`<span class="r-step r-hi">Basel problem: Σ 1/n² = π²/6 ✓ (solved by Euler, 1734)</span>`:''}
+    <span class="r-note">ζ(−1) = 1+2+3+4+… = −1/12 in analytic continuation. Yes, really. No, we don't talk about it.</span>
+    ${headache(Math.min(97, 40 + (N<100?20:0) + (Math.abs(s-Math.round(s))<0.01?20:0)), s<1.1?'Divergence Trauma':'Number Theory Headache')}
+  `);
+}
+
+// ── Auto-init ──
+window.addEventListener('load', () => {
+  doBlackHole();
+  doLorentz();
+  doTaylor();
+  doSchrodinger();
+  doFourier();
+  doEuler();
+  doNavierStokes();
+  doShannon();
+  escPreset();
+  doZeta();
+});
+
+// Enter key
+document.querySelectorAll('input[type=number], input[type=text]').forEach(inp => {
+  inp.addEventListener('keydown', e => {
+    if(e.key==='Enter') {
+      const btn = inp.closest('.card').querySelector('.btn');
+      if(btn) btn.click();
+    }
+  });
+});
+
+// Shannon: live update
+document.getElementById('shan-text').addEventListener('input', doShannon);
+document.getElementById('lor-v').addEventListener('input', doLorentz);
+document.getElementById('euler-θ').addEventListener('input', doEuler);
+</script>
+</body>
+</html>
